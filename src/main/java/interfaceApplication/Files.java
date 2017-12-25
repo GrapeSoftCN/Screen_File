@@ -37,7 +37,7 @@ public class Files {
 		}
 		if (UserInfo != null && UserInfo.size() > 0) {
 			currentWeb = UserInfo.getString("currentWeb");
-			userId = JSONObject.toJSON(UserInfo.getString("_id")).getString("$oid");
+			userId = UserInfo.getString("_id");
 		}
 	}
 	private String getFlePath(String key) {
@@ -62,16 +62,15 @@ public class Files {
 				return this.fileModel.resultMessage(6);
 			}
 
-			String host = getFlePath("APIHost");
-			String appid = getFlePath("appid");
 			int width = Integer.parseInt(getFlePath("width"));
 			int height = Integer.parseInt(getFlePath("height"));
 			String url = encodeURL(object);
 			if ((url != null) && (!url.equals(""))) {
-				String urls = host + "/" + appid + "/GrapeCutImage/ImageOpeation/getNetImage/" + url + "/int:" + width
-						+ "/int:" + height;
-				System.out.println(urls);
-				thumbnail = request.Get(urls);
+//				String urls = host + "/" + appid + "/GrapeCutImage/ImageOpeation/getNetImage/" + url + "/int:" + width
+//						+ "/int:" + height;
+//				System.out.println(urls);
+//				thumbnail = request.Get(urls);
+				thumbnail = (String)appsProxy.proxyCall("/GrapeCutImage/ImageOpeation/getNetImage/" + url + "/int:" + width+"/int:" + height);
 			}
 			thumbnail = CreateImage(thumbnail);
 			if ((thumbnail == null) || (thumbnail.equals("")) || (thumbnail.equals("null"))) {

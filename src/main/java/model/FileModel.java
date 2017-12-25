@@ -5,6 +5,9 @@ import apps.appsProxy;
 import authority.plvDef.UserMode;
 import database.DBHelper;
 import database.db;
+import interfaceModel.GrapeDBSpecField;
+import interfaceModel.GrapeTreeDBModel;
+
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,7 +23,9 @@ import session.session;
 import string.StringHelper;
 
 public class FileModel {
-	private DBHelper file;
+	private GrapeTreeDBModel file;
+    private GrapeDBSpecField gDbSpecField;
+	
 	private JSONObject _obj = new JSONObject();
 	private String sid = null;
 	private String currentWeb = null;
@@ -29,6 +34,12 @@ public class FileModel {
 	private session se;
 
 	public FileModel() {
+		file = new GrapeTreeDBModel();
+        gDbSpecField = new GrapeDBSpecField();
+        gDbSpecField.importDescription(appsProxy.tableConfig("Files"));
+        file.descriptionModel(gDbSpecField);
+        file.bindApp();
+		
 		se = new session();
 		sid = session.getSID();
 		if (this.sid != null) {
@@ -36,13 +47,12 @@ public class FileModel {
 		}
 		if (UserInfo != null && UserInfo.size() > 0) {
 			currentWeb = UserInfo.getString("currentWeb");
-			userId = JSONObject.toJSON(UserInfo.getString("_id")).getString("$oid");
+			userId = UserInfo.getString("_id");
 		}
-		this.file = new DBHelper(appsProxy.configValue().get("db").toString(), "file");
 	}
 
 	private db bind() {
-		return this.file.bind(String.valueOf(appsProxy.appid()));
+		return file.bind(String.valueOf(appsProxy.appid()));
 	}
 
 	public db getDB() {
@@ -109,8 +119,7 @@ public class FileModel {
 			for (Iterator localIterator = array.iterator(); localIterator.hasNext();) {
 				Object object2 = localIterator.next();
 				JSONObject object = (JSONObject) object2;
-				JSONObject objId = (JSONObject) object.get("_id");
-				rObject.put(objId.getString("$oid"), object);
+				rObject.put(object.getString("_id"), object);
 			}
 		}
 		return rObject;
@@ -248,8 +257,7 @@ public class FileModel {
 			int i = 0;
 			for (int lens = array.size(); i < lens; i++) {
 				JSONObject object = (JSONObject) array.get(i);
-				JSONObject object2 = (JSONObject) object.get("_id");
-				list.add(object2.get("$oid").toString());
+				list.add(object.getString("_id"));
 			}
 		}
 		list.add(fid);
